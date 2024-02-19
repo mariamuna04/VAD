@@ -182,3 +182,4 @@ cython_debug/
 # Customs
 initial-dataset/*.zip
 dataset/*.zip
+*.npy
