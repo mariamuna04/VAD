@@ -1,5 +1,6 @@
 """
 Library for generating embedding of videos for a given folder.
+This file will run automatically when the library is imported.
 """
 
 # For importing * from this library
