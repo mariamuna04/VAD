@@ -92,7 +92,7 @@ if __name__ == '__main__':
     # Specify the input directory (containing the videos to be segmented)
     input_dir = '/path/to/folder'
     # Specify the output directory (where the segmented videos will be saved)
-    output_dir = 'r_seg'
+    output_dir = '/path/to/output/folder'
     # segment_duration = 10  # seconds
 
     # Create output directory if it doesn't exist
