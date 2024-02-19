@@ -49,6 +49,24 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(128 * 26 * 26, 1024, device=device)  # Adjust input size based on your frame size
 
     def forward(self, x):
+        """
+        Forward pass of the CNN.
+
+        Takes an input batch of images `x` and performs the following:
+            1. Converts the input to the device (e.g., GPU).
+            2. Applies ReLU activation to the output of the first convolutional layer.
+            3. Performs max pooling with a kernel size of 2.
+            4. Repeats steps 2 and 3 for the second and third convolutional layers.
+            5. Flattens the output of the last pooling layer.
+            6. Applies ReLU activation to the output of the fully-connected layer.
+            7. Returns the final feature vector.
+
+        Args:
+            x (torch.Tensor): Input batch of images of shape (batch_size, channels, height, width).
+
+        Returns:
+            torch.Tensor: Output feature vector of shape (batch_size, 1024).
+        """
         x = x.to(device)
         x = F.relu(self.conv1(x))
         x = self.pool(x)
