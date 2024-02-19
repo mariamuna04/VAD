@@ -1,5 +1,7 @@
 ## Initial Dataset
 
+---
+
 This file contains the 10-second segmented video clips from all 13 classes from the Dataset.
 
 ### Base Dataset:
