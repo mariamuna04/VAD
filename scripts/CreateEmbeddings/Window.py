@@ -4,9 +4,6 @@ import torch
 from .EmbeddingModel import CNN
 from . import device
 
-# Select Device According to Availability
-print("Device selected:", device)
-
 
 class Window:
     def __init__(self, video_path,
