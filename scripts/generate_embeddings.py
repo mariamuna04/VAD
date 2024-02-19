@@ -31,7 +31,7 @@ and 1 for anomaly. The embeddings and labels will be saved in the same folder wi
 labels.npy.
 """
 embeddings, labels = Dataset.create_dataset(
-    '../dataset/',
+    '../sample-dataset/',
     class_label_index=2,
     true_class_name='anomaly'
 )
@@ -43,6 +43,5 @@ embeddings, labels = Dataset.create_dataset(
 print("Embeddings Shape: ", embeddings.shape)
 print("Labels Shape: ", labels.shape)
 
-# NOTE: x may differ due to shape mismatch in the videos. Some videos may have less than 4 frames or 24 features.
-# FIXME: This problem can be solved by padding the videos with zeros to make them of the same shape.
-#  Will be done in future.
+# NOTE: x may differ due to shape mismatch in the videos. Some videos may have less than 4 windows or 24 frames
+# or 1024 features. This is fixed by padding the videos with zeros to make them of the same shape using np.pad.
