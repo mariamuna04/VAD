@@ -7,16 +7,24 @@ This directory contains 2 subdirectories:
 - `dataset/anomaly`
 - `dataset/nonanomaly`
 
-The `anomaly` directory contains the 10-second segmented video clips from all 13 classes that are manually labeled as anomalies. The `nonanomaly` directory contains the 10-second segmented video clips that are manually labeled as non-anomalies.
+> This structure should be maintained because the code is written to read the dataset from these directories.
+
+The `anomaly` directory contains the **10-second** segmented video clips from all 13 classes that are manually labeled as anomalies. The `nonanomaly` directory contains the 10-second segmented video clips that are manually labeled as non-anomalies.
 
 `anomaly` class contains the following classes:
-- abuse
-- arson
-- explosion
-- fighting
-- roadaccident
-- shooting
-- vandalism
+- [x] abuse
+- [ ] arrest
+- [x] arson
+- [ ] assault
+- [ ] burglary
+- [x] explosion
+- [x] fighting
+- [ ] normal
+- [x] roadaccident
+- [ ] robbery
+- [x] shooting
+- [ ] shoplifting
+- [x] vandalism
 
 **Total Videos:** `1944`
 
