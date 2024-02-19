@@ -5,6 +5,9 @@ from .EmbeddingModel import CNN
 from . import device
 
 
+# This class takes a video path and return a `Window` object. A `Window` object is a
+# generator object which can be used to iterate over the video frames in a sliding window fashion.
+
 class Window:
     def __init__(self, video_path,
                  class_label_index,
@@ -194,7 +197,8 @@ class Window:
     def shape(self):
         return self.__windows.shape
 
-
+# This class takes a window object and returns the embeddings of the window using the CNN model.
+# It maintains the sliding window of frames and extracts the embeddings of each frame using the CNN model.
 class WindowEmbedded:
     def __init__(self, windows: Window):
         self.__windows = windows
