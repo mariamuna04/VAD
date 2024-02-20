@@ -13,7 +13,7 @@ from .Window import Window, WindowEmbedded
 
 
 # Function to create the dataset
-def create_dataset(file_path: str,
+def create_dataset(directory_path: str,
                    class_label_index: int,
                    true_class_name: str = 'anomaly',
                    shuffle_data: bool = True,
@@ -26,7 +26,7 @@ def create_dataset(file_path: str,
 
     Parameters
     ----------
-    file_path : str
+    directory_path : str
         The folder path containing the videos.
     class_label_index : int
         The index of the class name in the file path. For example, if the file path is
@@ -62,8 +62,16 @@ def create_dataset(file_path: str,
         The labels of the videos.
     """
 
+    # If the file path does not exist, raise an error
+    if not glob(directory_path):
+        raise FileNotFoundError(f"The folder path '{directory_path}' does not exist.")
+
+    # If the file is empty, raise an error
+    if not glob(directory_path + f'/*/*.{video_ext}'):
+        raise FileNotFoundError(f"The folder '{directory_path}' does not contain any videos with extension '{video_ext}'.")
+
     # Create glob path for the videos
-    rgx = file_path + f'/*/*.{video_ext}'
+    rgx = directory_path + f'/*/*.{video_ext}'
     # extract the paths of the videos
     paths = glob(rgx)
 
@@ -138,7 +146,7 @@ def create_dataset(file_path: str,
     # Convert the embeddings and labels to numpy arrays
     padded_arrays = np.asarray(padded_embeddings, dtype='float32')
 
-    # Save the embeddings and labels and return
+    # Convert the embeddings to np.ndarray
     all_embeddings = np.array(padded_arrays)
     all_labels = np.array(all_labels)
     # If argument save is True, save the embeddings and labels

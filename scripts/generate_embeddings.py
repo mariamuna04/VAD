@@ -31,7 +31,7 @@ and 1 for anomaly. The embeddings and labels will be saved in the same folder wi
 labels.npy.
 """
 embeddings, labels = Dataset.create_dataset(
-    '../sample-dataset/',
+    '../dataset/',
     class_label_index=2,
     true_class_name='anomaly'
 )
