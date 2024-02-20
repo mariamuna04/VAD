@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import torch
 from .EmbeddingModel import CNN
-from . import device
+from . import device, this_os
 
 
 # This class takes a video path and return a `Window` object. A `Window` object is a
@@ -40,7 +40,10 @@ class Window:
         # The index of the current window in the windowed clip
         self.__window_index = 0
         # Class label of the video path
-        self.class_label = 1 if video_path.split('/')[class_label_index] == true_class_name else 0
+        if this_os == "nt":
+            self.class_label = 1 if video_path.split('\\')[class_label_index] == true_class_name else 0
+        else:
+            self.class_label = 1 if video_path.split('/')[class_label_index] == true_class_name else 0
 
     def next(self):
         """
@@ -196,6 +199,7 @@ class Window:
     @property
     def shape(self):
         return self.__windows.shape
+
 
 # This class takes a window object and returns the embeddings of the window using the CNN model.
 # It maintains the sliding window of frames and extracts the embeddings of each frame using the CNN model.

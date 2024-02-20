@@ -9,6 +9,10 @@ __all__ = ['Window', 'Dataset', 'EmbeddingModel']
 import torch
 import os
 
+this_os = os.name
+
+print("Operating System:", this_os)
+
 # Set the device to use (e.g., 'cpu', 'cuda', 'mps')
 device = torch.device("mps" if torch.backends.mps.is_available() else
                       ("cuda" if torch.cuda.is_available() else "cpu")
