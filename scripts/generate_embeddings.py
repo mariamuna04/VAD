@@ -12,7 +12,7 @@ dataset:
 """
 
 # Importing the required libraries, This is a custom library, see the library for more details...
-from CreateEmbeddings import Dataset
+from AnomalyDetection.CreateEmbeddings import Dataset
 
 # Creating the dataset
 """
