@@ -4,7 +4,7 @@ This file will run automatically when the library is imported.
 """
 
 # For importing * from this library
-__all__ = ['Window', 'Dataset', 'EmbeddingModel']
+__all__ = ['Window', 'Dataset', 'EmbeddingModel', 'device', 'this_os']
 
 import torch
 import os
