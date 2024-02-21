@@ -38,7 +38,7 @@ class SRUModel(Module):
         return output
 
     def l2_regularization(self):
-        l2_reg = torch.tensor(0., device=self.fc.weight.device)
+        l2_reg = torch.tensor(0., device=device)
         for param in self.parameters():
             l2_reg += torch.norm(param, p=2)
         return self.l2_reg_lambda * l2_reg
