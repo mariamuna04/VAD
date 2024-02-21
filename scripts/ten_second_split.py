@@ -6,7 +6,7 @@ It uses the OpenCV library to read and write video files, and the os and tqdm li
 operations, respectively.
 
 The segment_video function takes an input video file, an output video file pattern, and an optional segment duration as
-input. It opens the input video file using OpenCV's VideoCapture class, and then calculates the frame rate and total
+input. It opens the input video file using OpenCVs' VideoCapture class, and then calculates the frame rate and total
 number of frames in the video. It then calculates the number of frames for the segment duration, and initializes the
 current frame and segment index. It then loops through the video frames and segments the video into multiple videos of
 the specified duration. For each segment, it creates a VideoWriter object to write the segment to a new video file, and
