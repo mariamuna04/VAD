@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import torch
-from .EmbeddingModel import CNN
-from . import device, this_os
+from AnomalyDetection.CreateEmbeddings.EmbeddingModel import CNN
+from AnomalyDetection import device, this_os
 
 
 # This class takes a video path and return a `Window` object. A `Window` object is a

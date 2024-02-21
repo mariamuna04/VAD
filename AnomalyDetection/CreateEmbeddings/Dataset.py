@@ -3,13 +3,13 @@ This file contains the function to create the dataset from the videos. Dataset m
 embeddings are the features extracted from the videos and the labels are the class labels for the videos. The class
 labels are 0 for non-anomaly and 1 for anomaly.
 """
-
 # Importing the required libraries
+import os
 from random import shuffle
 from glob import glob
 import numpy as np
 from tqdm import tqdm
-from .Window import Window, WindowEmbedded
+from AnomalyDetection.CreateEmbeddings.Window import Window, WindowEmbedded
 
 
 # Function to create the dataset
@@ -68,7 +68,8 @@ def create_dataset(directory_path: str,
 
     # If the file is empty, raise an error
     if not glob(directory_path + f'/*/*.{video_ext}'):
-        raise FileNotFoundError(f"The folder '{directory_path}' does not contain any videos with extension '{video_ext}'.")
+        raise FileNotFoundError(
+            f"The folder '{directory_path}' does not contain any videos with extension '{video_ext}'.")
 
     # Create glob path for the videos
     rgx = directory_path + f'/*/*.{video_ext}'
@@ -151,8 +152,12 @@ def create_dataset(directory_path: str,
     all_labels = np.array(all_labels)
     # If argument save is True, save the embeddings and labels
     if save:
-        np.save('embeddings.npy', all_embeddings)
-        np.save('labels.npy', all_labels)
+        # Create an 'out' directory in root folder if not created
+        os.makedirs('out', exist_ok=True)
+        # Save the embeddings and labels
+        np.save('out/embeddings.npy', all_embeddings)
+        np.save('out/labels.npy', all_labels)
+        print("Embeddings and Labels saved in 'out' directory")
 
     # Return the embeddings and labels (np.ndarray)
     return all_embeddings, all_labels
