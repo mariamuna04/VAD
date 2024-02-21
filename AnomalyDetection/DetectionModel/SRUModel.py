@@ -18,11 +18,9 @@ class SRUModel(Module):
             highway_bias=kwargs.get('highway_bias', 0.0),
             rescale=kwargs.get('rescale', True),
             nn_rnn_compatible_return=kwargs.get('nn_rnn_compatible_return', False),
-            custom_m=kwargs.get('custom_m', None),
             proj_input_to_hidden_first=kwargs.get('proj_input_to_hidden_first', False),
             amp_recurrence_fp16=kwargs.get('amp_recurrence_fp16', False),
             normalize_after=kwargs.get('normalize_after', False),
-            weight_c_init=kwargs.get('weight_c_init', None),
         ).to(device)
         # Dropout layer
         self.dropout = Dropout(kwargs.get('dropout_layer_prob', 0.2)).to(device)
