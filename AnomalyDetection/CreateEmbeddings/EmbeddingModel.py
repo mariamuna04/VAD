@@ -25,7 +25,9 @@ FOR PRODUCTION.
 # Importing the required libraries
 import torch.nn as nn
 import torch.nn.functional as F
+
 from AnomalyDetection import device
+
 
 # Defining the CNN model
 class CNN(nn.Module):
