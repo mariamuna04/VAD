@@ -1,0 +1,13 @@
+{
+  "num_layers": 2,
+  "dropout": 0.0,
+  "bidirectional": "False",
+  "layer_norm": "False",
+  "highway_bias": 0.0,
+  "has_skip_term": "True",
+  "rescale": "True",
+  "nn_rnn_compatible_return": "False",
+  "proj_input_to_hidden_first": "False",
+  "amp_recurrence_fp16": "False",
+  "normalize_after": "False"
+}
