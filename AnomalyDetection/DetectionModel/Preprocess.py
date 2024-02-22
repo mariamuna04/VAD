@@ -43,7 +43,7 @@ def preprocess_data(embeddings: np.ndarray or str, labels: np.ndarray or str, te
     return train_data, test_data
 
 
-def get_dataloader(train_data: TensorDataset, test_data: TensorDataset, batch_size: int = 8):
+def create_dataloader(train_data: TensorDataset, test_data: TensorDataset, batch_size: int = 8):
     train_loader = DataLoader(train_data, shuffle=True, batch_size=batch_size)
     test_loader = DataLoader(test_data, shuffle=True, batch_size=batch_size)
     return train_loader, test_loader

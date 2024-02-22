@@ -8,7 +8,7 @@ NOTE:
 """
 
 # Importing the required libraries
-from AnomalyDetection.DetectionModel.Preprocess import preprocess_data, get_dataloader
+from AnomalyDetection.DetectionModel.Preprocess import preprocess_data, create_dataloader
 from AnomalyDetection.DetectionModel.CreateModel import CreateModel, load_params
 
 # Preprocess the data
@@ -20,7 +20,7 @@ train_data, test_data = preprocess_data(
 
 # Create the PyTorch DataLoader
 # train_loader and test_loader are of type DataLoader
-train_loader, test_loader = get_dataloader(train_data, test_data, batch_size=8)
+train_loader, test_loader = create_dataloader(train_data, test_data, batch_size=8)
 
 """
 CreateModel is a custom class that creates a model with a specified input size and hidden size. You can specify various
