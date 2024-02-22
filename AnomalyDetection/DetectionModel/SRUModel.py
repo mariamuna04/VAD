@@ -15,6 +15,7 @@ class SRUModel(Module):
             dropout=kwargs.get('dropout_prob', 0.0),
             bidirectional=kwargs.get('bidirectional', False),
             layer_norm=kwargs.get('layer_norm', False),
+            has_skip_term=kwargs.get('has_skip_term', True),
             highway_bias=kwargs.get('highway_bias', 0.0),
             rescale=kwargs.get('rescale', True),
             nn_rnn_compatible_return=kwargs.get('nn_rnn_compatible_return', False),
