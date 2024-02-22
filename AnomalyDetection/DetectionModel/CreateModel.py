@@ -5,6 +5,7 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 import logging
 from tqdm import tqdm
+import json
 
 default_model_kwargs = {
     'num_layers': 2,
@@ -108,3 +109,11 @@ class CreateModel:
         self.model.eval()
         print(f"Model loaded from {path}.pt")
         return self.model
+
+
+def load_params(json_file: str):
+    """
+    Read the parameters from a JSON file and return them as a dictionary.
+    """
+    with open(json_file, 'r') as file:
+        return json.load(file)
