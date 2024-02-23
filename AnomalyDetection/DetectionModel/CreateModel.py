@@ -37,6 +37,7 @@ class CreateModel:
                  hidden_size,
                  **kwargs):
         self.model = SRUModel(input_size, hidden_size, **kwargs).to(device)
+        self._model_ready_state = False
 
     def fit(self,
             train_loader,
@@ -88,8 +89,12 @@ class CreateModel:
 
         # Close logging
         logging.shutdown()
+        self._model_ready_state = True
 
     def evaluate(self, test_loader: DataLoader):
+        if not self._model_ready_state:
+            raise Exception("Model not ready to evaluate. Train the model first.")
+
         self.model.eval()  # Set model to evaluation mode
         correct = 0
         total = 0
@@ -108,12 +113,15 @@ class CreateModel:
         pass
 
     def save(self, path: str):
+        if not self._model_ready_state:
+            raise Exception("Model not ready to save. Train the model first.")
         torch.save(self.model.state_dict(), path)
 
     def load(self, path: str):
         try:
             self.model.load_state_dict(torch.load(path, map_location=device))
             print(f"Model loaded from {path}")
+            self._model_ready_state = True
         except Exception as e:
             if isinstance(e, FileNotFoundError):
                 print(f"\033[91mModel not found at {path}\033[0m")
