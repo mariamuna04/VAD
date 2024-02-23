@@ -13,7 +13,7 @@ The `anomaly` directory contains the **10-second** segmented video clips from al
 
 `anomaly` class contains the following classes:
 - [x] abuse
-- [ ] arrest
+- [ ] <strike>arrest</strike> (Crossed out because arrest is not considered as an anomaly)
 - [x] arson
 - [ ] assault
 - [ ] burglary
