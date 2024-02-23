@@ -40,14 +40,15 @@ class CNN(nn.Module):
 
     def __init__(self):
         super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, 3, 1, 0, device=device)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1, 0, device=device)
-        self.d = nn.Dropout(0.5)
-        self.conv3 = nn.Conv2d(64, 128, 3, 1, 0, device=device)
+        self.conv_layer_1 = nn.Conv2d(3, 32, 3, 1, 0, device=device)
+        self.conv_layer_2 = nn.Conv2d(32, 64, 3, 1, 0, device=device)
+        self.conv_layer_3 = nn.Conv2d(64, 128, 3, 1, 0, device=device)
+        self.dropout = nn.Dropout(0.5)
         # Pooling layer, All are same
-        self.pool = nn.MaxPool2d(2, 2)
+        self.pooling_layer = nn.MaxPool2d(2, 2)
         # Fully connected layer
-        self.fc1 = nn.Linear(128 * 26 * 26, 1024, device=device)  # Adjust input size based on your frame size
+        # Adjust input size based on your frame size
+        self.linear = nn.Linear(128 * 26 * 26, 1024, device=device)
 
     def forward(self, x):
         """
@@ -69,15 +70,12 @@ class CNN(nn.Module):
             torch.Tensor: Output feature vector of shape (batch_size, 1024).
         """
         x = x.to(device)
-        x = F.relu(self.conv1(x))
-        x = self.pool(x)
-        x = F.relu(self.conv2(x))
-        x = self.pool(x)
-        x = F.relu(self.conv3(x))
-        x = self.pool(x)
-        # For batch size 1
+        x = F.relu(self.conv_layer_1(x))
+        x = self.pooling_layer(x)
+        x = F.relu(self.conv_layer_2(x))
+        x = self.pooling_layer(x)
+        x = F.relu(self.conv_layer_3(x))
+        x = self.pooling_layer(x)
         x = x.view(-1, 128 * 26 * 26)
-        # For batch size > 1
-        # x = x.view(x.size(0), -1)
-        x = F.relu(self.fc1(x))
+        x = F.relu(self.linear(x))
         return x
