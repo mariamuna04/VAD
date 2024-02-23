@@ -1,6 +1,7 @@
 import json
 import logging
 
+import numpy as np
 import torch
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
@@ -113,8 +114,25 @@ class CreateModel:
         test_accuracy = 100 * correct / total
         print(f'Test Accuracy of the model on the test dataset: {test_accuracy:.2f}%')
 
-    def predict(self, test_loader: DataLoader):
-        pass
+    def predict(self, data: torch.tensor or np.ndarray):
+        if not self._model_ready_state:
+            raise Exception("Model not ready to predict. Train the model first.")
+        if isinstance(data, np.ndarray):
+            data = torch.from_numpy(data).to(device)
+        elif isinstance(data, torch.Tensor):
+            data = data.to(device)
+        else:
+            raise Exception("Data type not supported. Use either numpy array or torch tensor")
+
+        for element in data:
+            element = element.unsqueeze(0)
+            with torch.no_grad():
+                self.model.eval()
+                outputs = self.model(element)  # Get model predictions
+                predicted_classes = torch.argmax(outputs, dim=1)  # Apply argmax along class dimension
+                print(predicted_classes)  # Print the predicted class indices
+
+
 
     def save(self, path: str):
         if not self._model_ready_state:
