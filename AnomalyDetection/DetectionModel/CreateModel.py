@@ -124,6 +124,9 @@ class CreateModel:
         else:
             raise Exception("Data type not supported. Use either numpy array or torch tensor")
 
+        if len(data.shape) == 4:
+            data = data.reshape(data.shape[0], data.shape[1], -1)
+
         for element in data:
             element = element.unsqueeze(0)
             with torch.no_grad():
