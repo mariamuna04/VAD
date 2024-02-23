@@ -108,7 +108,7 @@ class CreateModel:
         pass
 
     def save(self, path: str):
-        torch.save(self.model.state_dict(), path + '.pt')
+        torch.save(self.model.state_dict(), path)
 
     def load(self, path: str):
         try:
