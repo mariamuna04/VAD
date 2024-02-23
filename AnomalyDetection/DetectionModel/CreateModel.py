@@ -37,12 +37,11 @@ class CreateModel:
                  hidden_size,
                  model_name=None,
                  **kwargs):
-        self.model = SRUModel(input_size, hidden_size, **kwargs).to(device)
+        if model_name is None:
+            model_name = 'AD-SRU-Model'
+        self.model_name = model_name
+        self.model = SRUModel(input_size, hidden_size, model_name, **kwargs).to(device)
         self._model_ready_state = False
-        if model_name is not None:
-            self.model_name = model_name
-        else:
-            self.model_name = 'AD-SRU-Model'
 
     def fit(self,
             train_loader,

@@ -1,12 +1,14 @@
 import torch
-from torch.nn import Module, Dropout, Linear
 from sru import SRU
+from torch.nn import Module, Dropout, Linear
+
 from AnomalyDetection import device
 
 
 class SRUModel(Module):
-    def __init__(self, input_size, hidden_size, **kwargs):
+    def __init__(self, input_size, hidden_size, model_name, **kwargs):
         super(SRUModel, self).__init__()
+        self.model_name = model_name
         # Main SRU layer
         self.sru_layers = SRU(
             input_size=input_size,
@@ -43,3 +45,8 @@ class SRUModel(Module):
         for param in self.parameters():
             l2_reg += torch.norm(param, p=2)
         return self.l2_reg_lambda * l2_reg
+
+    def __repr__(self):
+        custom_repr = super(SRUModel, self).__repr__()[len(self.__class__.__name__):]
+        return self.model_name + custom_repr
+
