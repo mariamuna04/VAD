@@ -132,8 +132,6 @@ class CreateModel:
                 predicted_classes = torch.argmax(outputs, dim=1)  # Apply argmax along class dimension
                 print(predicted_classes)  # Print the predicted class indices
 
-
-
     def save(self, path: str):
         if not self._model_ready_state:
             raise Exception("Model not ready to save. Train the model first.")

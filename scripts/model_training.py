@@ -43,7 +43,7 @@ and pass it to the CreateModel class. The default parameters are as follows:
 # Load the default parameters, you can skip this
 default_params = load_params('parameters.json')
 # Create the model
-model = CreateModel(input_size=24576, hidden_size=1024, **default_params)
+model = CreateModel(input_size=24576, hidden_size=1024, model_name='MyCustomModel')
 
 # Train the model
 # You can specify the number of epochs, criterion, optimizer, and log_report
