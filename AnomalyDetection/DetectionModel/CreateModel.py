@@ -35,9 +35,14 @@ class CreateModel:
     def __init__(self,
                  input_size,
                  hidden_size,
+                 model_name=None,
                  **kwargs):
         self.model = SRUModel(input_size, hidden_size, **kwargs).to(device)
         self._model_ready_state = False
+        if model_name is not None:
+            self.model_name = model_name
+        else:
+            self.model_name = 'AD-SRU-Model'
 
     def fit(self,
             train_loader,
@@ -130,6 +135,9 @@ class CreateModel:
 
         # Return the model
         return self.model
+
+    def __repr__(self):
+        return self.model.__repr__()
 
 
 def load_params(json_file: str):
