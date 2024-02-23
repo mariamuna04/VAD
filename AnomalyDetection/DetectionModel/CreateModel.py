@@ -1,11 +1,14 @@
+import json
+import logging
+
 import torch
-from torch.utils.data import DataLoader
-from AnomalyDetection.DetectionModel.SRUModel import SRUModel
 from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
-import logging
+from torch.utils.data import DataLoader
 from tqdm import tqdm
-import json
+
+from AnomalyDetection import device
+from AnomalyDetection.DetectionModel.SRUModel import SRUModel
 
 default_model_kwargs = {
     'num_layers': 2,
@@ -33,7 +36,7 @@ class CreateModel:
                  input_size,
                  hidden_size,
                  **kwargs):
-        self.model = SRUModel(input_size, hidden_size, **kwargs)
+        self.model = SRUModel(input_size, hidden_size, **kwargs).to(device)
 
     def fit(self,
             train_loader,
@@ -80,6 +83,9 @@ class CreateModel:
             logging.info(f'Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss}, Accuracy: {epoch_accuracy}%')
             print(f'Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss}, Accuracy: {epoch_accuracy}%')
 
+            if log_report:
+                logging.info(f'Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss}, Accuracy: {epoch_accuracy}%')
+
         # Close logging
         logging.shutdown()
 
@@ -105,9 +111,16 @@ class CreateModel:
         torch.save(self.model.state_dict(), path + '.pt')
 
     def load(self, path: str):
-        self.model.load_state_dict(torch.load(path + '.pt'))
-        self.model.eval()
-        print(f"Model loaded from {path}.pt")
+        try:
+            self.model.load_state_dict(torch.load(path, map_location=device))
+            print(f"Model loaded from {path}")
+        except Exception as e:
+            if isinstance(e, FileNotFoundError):
+                print(f"\033[91mModel not found at {path}\033[0m")
+            elif isinstance(e, RuntimeError):
+                print(f"\033[91mModel Signature Mismatch. Try a different model\033[0m")
+
+        # Return the model
         return self.model
 
 
