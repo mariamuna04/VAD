@@ -67,7 +67,7 @@ def segment_video(in_file, out_file, segment_duration=10):
 
         # Create a VideoWriter object to write the segment to a new video file
         # The VideoWriter object takes the output file name, codec, frame rate, and frame size as input
-        out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), fps, (int(cap.get(3)), int(cap.get(4))))
+        out = cv2.VideoWriter(output_file, cv2.VideoWriter.fourcc(*'mp4v'), fps, (int(cap.get(3)), int(cap.get(4))))
 
         # Set the current frame to the start frame
         cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
