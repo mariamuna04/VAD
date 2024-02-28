@@ -2,7 +2,7 @@
 
 ---
 
-This file contains the 10-second segmented video clips from all 13 classes from the Dataset.
+This file contains the 10-second segmented video clips from all 14 classes from the Dataset.
 
 ### Base Dataset:
 
@@ -29,4 +29,4 @@ We have used the base dataset to create the 10-second segmented video clips for 
 
 [Google Drive Link](https://drive.google.com/drive/folders/15nkDhc1I7O3kgquHDLD6EmnB1oY7hItB?usp=share_link)
 
-Here is the link of 13 zip files, each containing the 10-second segmented video clips for each class.
+Here is the link of 14 zip files, each containing the 10-second segmented video clips for each class.
