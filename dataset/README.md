@@ -24,6 +24,7 @@ The `anomaly` directory contains the **10-second** segmented video clips from al
 - [x] robbery
 - [x] shooting
 - [ ] shoplifting
+- [ ] stealing
 - [x] vandalism
 
 **Total Videos:** `1944`
