@@ -16,7 +16,7 @@ The `anomaly` directory contains the **10-second** segmented video clips from al
 - [ ] <strike>arrest</strike> (Crossed out because arrest is not considered as an anomaly)
 - [x] arson
 - [x] assault
-- [ ] burglary
+- [x] burglary
 - [x] explosion
 - [x] fighting
 - [ ] normal
