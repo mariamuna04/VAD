@@ -23,7 +23,7 @@ The `anomaly` directory contains the **10-second** segmented video clips from al
 - [x] roadaccident
 - [x] robbery
 - [x] shooting
-- [ ] shoplifting
+- [x] shoplifting
 - [ ] stealing
 - [x] vandalism
 
