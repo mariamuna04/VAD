@@ -1,8 +1,8 @@
 # Dataset Description
 
-This file contains the description of the dataset used in the project.
+This file contains the information about dataset source.
 
-## Base Dataset:
+## Base Dataset
 
 We used the **[Real-Time Anomaly Detection in CCTV Surveillance
 ](https://www.kaggle.com/datasets/webadvisor/real-time-anomaly-detection-in-cctv-surveillance)** dataset from Kaggle.
@@ -27,7 +27,7 @@ Real-Time Anomaly Detection in CCTV Surveillance
 
 * Video format is : *.mp4
 ```
-### Classes of the base dataset:
+### Classes of the base dataset
 - `abuse` (50 videos)
 - `arrest`  (50 videos)
 - `arson` (50 videos)
@@ -50,4 +50,4 @@ Real-Time Anomaly Detection in CCTV Surveillance
 ### Modifications
 
 We modified this dataset for our project. 
-Learn more at [`/dataset`](https://github.com/tinykishore/fydp-experiments/blob/master/dataset/README.md)
+See [`/dataset`](https://github.com/tinykishore/fydp-experiments/blob/master/dataset/README.md) for more information
