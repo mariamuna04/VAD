@@ -24,6 +24,8 @@ Real-Time Anomaly Detection in CCTV Surveillance
 │   ├── /vandalism
 │   ├── test.csv
 │   └── train.csv
+
+* Video format is : *.mp4
 ```
 ### Classes of the base dataset:
 - `abuse` (50 videos)
@@ -41,12 +43,7 @@ Real-Time Anomaly Detection in CCTV Surveillance
 - `stealing` (100 videos)
 - `vandalism` (50 videos)
 
-We have used the base dataset to create the 10-second segmented video clips for each class.
+**Total Videos: 1900**
 
-### Segmented Dataset:
-
-[Google Drive Link](https://drive.google.com/drive/folders/15nkDhc1I7O3kgquHDLD6EmnB1oY7hItB?usp=share_link)
-
-Here is the link of 14 zip files, each containing the 10-second segmented video clips for each class.
-
----
+We modified this dataset for our project. 
+Learn more at [`/dataset`](https://github.com/tinykishore/fydp-experiments/blob/master/dataset/README.md)
