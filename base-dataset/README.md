@@ -1,6 +1,6 @@
-# Dataset Description
+# Base Dataset Description
 
-This file contains the information about dataset source.
+This file contains the information about base dataset source.
 
 ## Base Dataset
 
