@@ -3,8 +3,8 @@
 [Ummay Maria Muna](mailto:umuna201429@bscse.uiu.ac.bd),
 [Shanta Biswas](mailto:sbiswas201418@bscse.uiu.ac.bd),
 [Syed Abu Ammar Muhammad Zarif](mailto:szarif202009@bscse.uiu.ac.bd),
-[Philip Jefferson Deori](mailto:pdeori202111@bscse.uiu.ac.bd)
-[Tauseef Tajwar](mailto:tauseef@cse.uiu.ac.bd)
+[Philip Jefferson Deori](mailto:pdeori202111@bscse.uiu.ac.bd),
+[Tauseef Tajwar](mailto:tauseef@cse.uiu.ac.bd), and
 [Dr. Swakkhar Shatabda](mailto:swakkhar@cse.uiu.ac.bd)
 
 Automated Video Anomaly Detection (VAD) is a challenging task due to its context-dependent and sporadic nature. Recent
