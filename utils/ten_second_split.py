@@ -105,5 +105,6 @@ if __name__ == '__main__':
             output_pattern = os.path.join(output_dir, filename.split('.')[0] + '_%03d.mp4')
             args_list.append((input_file, output_pattern, 10))  # Assuming default segment duration of 10 seconds
 
+    # Start Pool for multiprocessing
     with Pool() as pool:
         list(tqdm(pool.imap(segment_video, args_list), total=len(args_list)))
