@@ -184,3 +184,4 @@ initial-dataset/*.zip
 dataset/*/*.zip
 *.npy
 */test.py
+*.pth
