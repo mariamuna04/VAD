@@ -29,16 +29,16 @@ duration. You may need to handle this case separately if necessary.
 import cv2
 import os
 from tqdm import tqdm
+from multiprocessing import Pool
 
 
-def segment_video(in_file, out_file, segment_duration=10):
+def segment_video(args):
     """
     This function segments a video into multiple videos of a specified duration.
-    :param in_file: The input video file.
-    :param out_file: The output video file pattern (e.g., 'output_%03d.mp4').
-    :param segment_duration: The duration of each segment in seconds (default is 10 seconds).
-    :return:
+    :param args: A tuple containing input file, output file pattern, and segment duration.
     """
+    # Get all the arguments from the tuple
+    in_file, out_file, segment_duration = args
     # Open the input video file
     cap = cv2.VideoCapture(in_file)
     # Get the frame rate and total number of frames
@@ -93,14 +93,17 @@ if __name__ == '__main__':
     input_dir = '/path/to/folder'
     # Specify the output directory (where the segmented videos will be saved)
     output_dir = '/path/to/output/folder'
-    # segment_duration = 10  # seconds
-
-    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
+    # list of args for each video, used for multiprocessing
+    args_list = []
+
     # Loop over all input videos in the input directory
-    for filename in tqdm(os.listdir(input_dir)):
+    for filename in os.listdir(input_dir):
         if filename.endswith(".mp4"):
             input_file = os.path.join(input_dir, filename)
             output_pattern = os.path.join(output_dir, filename.split('.')[0] + '_%03d.mp4')
-            segment_video(input_file, output_pattern)
+            args_list.append((input_file, output_pattern, 10))  # Assuming default segment duration of 10 seconds
+
+    with Pool() as pool:
+        list(tqdm(pool.imap(segment_video, args_list), total=len(args_list)))
