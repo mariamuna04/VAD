@@ -1,11 +1,7 @@
 """
 Real-Time Video Anomaly Detection (VAD) Usage Example
-
 This script demonstrates how to use the real-time VAD processor for continuous
 video stream analysis with queue-based buffering and segment processing.
-
-USAGE: Run this script to see real-time video anomaly detection in action
-Author: Generated for VAD Project
 """
 
 import os
@@ -14,11 +10,9 @@ import argparse
 import json
 from pathlib import Path
 
-# Import the real-time VAD processor
 from real_time_vad_processor import RealTimeVADEngine
 
 def main():
-    """Main function to demonstrate real-time VAD processing."""
     parser = argparse.ArgumentParser(description='Real-Time Video Anomaly Detection')
     
     # Video source arguments
@@ -65,7 +59,6 @@ def main():
     
     args = parser.parse_args()
     
-    # Process video source argument
     video_source = args.video_source
     if args.rtsp_url:
         video_source = args.rtsp_url
@@ -81,7 +74,6 @@ def main():
     print("=" * 50)
     
     try:
-        # Initialize the VAD engine
         engine = RealTimeVADEngine(
             video_source=video_source,
             embedding_model=args.embedding_model,
@@ -92,32 +84,26 @@ def main():
             confidence_threshold=args.confidence_threshold
         )
         
-        # Initialize components
         print("Initializing components...")
         engine.initialize_components()
         
-        # Load models
         print("Loading models...")
         engine.load_models(
             sru_model_path=args.sru_model_path,
             cluster_model_path=args.cluster_model_path
         )
         
-        # Create output directory
         if args.save_results:
             os.makedirs(args.output_dir, exist_ok=True)
             results_file = os.path.join(args.output_dir, f'real_time_results_{int(time.time())}.json')
             all_results = []
         
-        # Start processing
         print("Starting real-time processing...")
         engine.start_processing()
         
-        # Wait for buffer to fill up
         print("Waiting for video buffer to fill...")
         time.sleep(5)
         
-        # Main monitoring loop
         start_time = time.time()
         last_stats_time = start_time
         
@@ -126,15 +112,12 @@ def main():
                 current_time = time.time()
                 elapsed_time = current_time - start_time
                 
-                # Check duration limit
                 if args.duration > 0 and elapsed_time >= args.duration:
                     print(f"Reached duration limit of {args.duration} seconds")
                     break
                 
-                # Get latest results
                 results = engine.get_latest_results(count=10)
                 
-                # Process and display results
                 for result in results:
                     timestamp = result.get('timestamp', current_time)
                     category = result['predicted_category']
@@ -142,17 +125,14 @@ def main():
                     is_anomaly = result['is_anomaly']
                     processing_time = result.get('processing_time', 0)
                     
-                    # Display result
-                    status = "🚨 ANOMALY" if is_anomaly else "✅ Normal"
+                    status = "ANOMALY" if is_anomaly else "Normal"
                     print(f"[{time.strftime('%H:%M:%S', time.localtime(timestamp))}] "
                           f"{status} | {category} | Confidence: {confidence:.4f} | "
                           f"Process Time: {processing_time:.3f}s")
                     
-                    # Save result if requested
                     if args.save_results:
                         all_results.append(result)
                 
-                # Display statistics
                 if current_time - last_stats_time >= args.stats_interval:
                     stats = engine.get_statistics()
                     print(f"\n--- Statistics (Elapsed: {elapsed_time:.1f}s) ---")
@@ -166,23 +146,19 @@ def main():
                     
                     last_stats_time = current_time
                 
-                # Small sleep to prevent excessive CPU usage
                 time.sleep(0.1)
                 
         except KeyboardInterrupt:
             print("\nProcessing interrupted by user")
         
-        # Stop processing
         print("Stopping processing...")
         engine.stop_processing()
         
-        # Save results if requested
         if args.save_results and all_results:
             print(f"Saving {len(all_results)} results to {results_file}")
             with open(results_file, 'w') as f:
                 json.dump(all_results, f, indent=2)
         
-        # Final statistics
         final_stats = engine.get_statistics()
         print(f"\n=== Final Statistics ===")
         print(f"Total runtime: {time.time() - start_time:.1f} seconds")
@@ -195,16 +171,13 @@ def main():
         print(f"Error: {e}")
         raise
 
-
 def test_with_sample_video():
     """Test the system with a sample video file."""
     print("=== Testing with Sample Video ===")
     
-    # This is a test function - you would need to provide actual model paths
-    sample_video = "test_video.mp4"  # Replace with actual video path
-    sru_model_path = "models/sru_model.pth"  # Replace with actual model path
-    cluster_model_path = "models/clustering_model.pkl"  # Replace with actual model path
-    
+    sample_video = "test_video.mp4"  
+    sru_model_path = "models/sru_model.pth" 
+    cluster_model_path = "models/clustering_model.pkl" 
     if not os.path.exists(sample_video):
         print(f"Sample video not found: {sample_video}")
         return
@@ -226,7 +199,6 @@ def test_with_sample_video():
         engine.load_models(sru_model_path, cluster_model_path)
         engine.start_processing()
         
-        # Process for 30 seconds
         time.sleep(30)
         
         engine.stop_processing()
