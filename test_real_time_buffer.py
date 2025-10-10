@@ -4,7 +4,7 @@ Test script for Real-Time VAD Buffer and Queue System
 This script tests the buffer mechanism, segment extraction, and queue operations
 without requiring actual video input or trained models.
 
-USAGE: Run this script to validate the buffer system
+USAGE: this script validate the buffer system
 Author: Generated for VAD Project
 """
 
@@ -127,7 +127,7 @@ class FrameBufferTest:
 
 def test_basic_buffer_operations():
     """Test basic buffer add/get operations."""
-    print("\n🧪 Testing Basic Buffer Operations")
+    print("\n Testing Basic Buffer Operations")
     print("=" * 50)
     
     buffer_test = FrameBufferTest()
@@ -159,7 +159,7 @@ def test_basic_buffer_operations():
 
 def test_buffer_overflow():
     """Test buffer behavior when exceeding capacity."""
-    print("\n🌊 Testing Buffer Overflow Behavior")
+    print("\n Testing Buffer Overflow Behavior")
     print("=" * 50)
     
     buffer_test = FrameBufferTest()
@@ -190,7 +190,7 @@ def test_buffer_overflow():
 
 def test_segment_extraction_overlap():
     """Test segment extraction with overlap."""
-    print("\n🔄 Testing Segment Extraction with Overlap")
+    print("\n Testing Segment Extraction with Overlap")
     print("=" * 50)
     
     buffer_test = FrameBufferTest()
@@ -225,7 +225,7 @@ def test_segment_extraction_overlap():
         if segments_extracted > 1:
             expected_start = previous_end - overlap + 1
             if start_id != expected_start:
-                print(f"  ⚠️  Expected overlap! Expected start: {expected_start}, Actual: {start_id}")
+                print(f" Expected overlap! Expected start: {expected_start}, Actual: {start_id}")
         
         previous_end = end_id
         
@@ -239,7 +239,7 @@ def test_segment_extraction_overlap():
 
 def test_concurrent_access():
     """Test thread-safe concurrent access."""
-    print("\n🧵 Testing Concurrent Access (Thread Safety)")
+    print("\n Testing Concurrent Access (Thread Safety)")
     print("=" * 50)
     
     buffer_test = FrameBufferTest()
@@ -296,7 +296,7 @@ def test_concurrent_access():
 
 def test_memory_usage():
     """Test memory usage estimation."""
-    print("\n💾 Testing Memory Usage Estimation")
+    print("\n Testing Memory Usage Estimation")
     print("=" * 50)
     
     # Calculate theoretical memory usage
@@ -340,7 +340,7 @@ def test_memory_usage():
 
 def run_all_tests():
     """Run all buffer tests."""
-    print("🎯 Real-Time VAD Buffer System Tests")
+    print(" Real-Time VAD Buffer System Tests")
     print("=" * 60)
     
     try:
@@ -350,10 +350,10 @@ def run_all_tests():
         test_concurrent_access()
         test_memory_usage()
         
-        print("\n✅ All tests completed successfully!")
+        print("\nAll tests completed successfully!")
         
     except Exception as e:
-        print(f"\n❌ Test failed with error: {e}")
+        print(f"\n Test failed with error: {e}")
         raise
 
 
