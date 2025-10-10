@@ -1,6 +1,6 @@
 """
 This is an implementation of window class
-------Discarded because of low accuracy------
+------Discarded because of low accuracy ------
 
 author: @mariamuna04, @tinykishore
 """
