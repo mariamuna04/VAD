@@ -8,8 +8,7 @@ This module provides complete inference pipeline for video anomaly detection:
 4. Enhances predictions using cluster-based cosine similarity weighting
 5. Outputs final anomaly classification with confidence scores
 
-USAGE: Use this module for real-time or batch inference on video segments
-Author: Generated for VAD Project
+We implemented this module for real-time or batch inference on video segments
 """
 
 import os
@@ -46,9 +45,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 class VADInferenceEngine:
     """
-    Complete Video Anomaly Detection Inference Engine.
-    
-    Combines video embedding generation, SRU/SRU++ prediction, and 
+    Complete Video Anomaly Detection Inference Engine | Combines video embedding generation, SRU/SRU++ prediction, and 
     cluster-based enhancement for robust anomaly detection.
     """
     
@@ -114,12 +111,7 @@ class VADInferenceEngine:
         return torch_device
     
     def load_embedding_model(self, model_config: Dict[str, Any]) -> None:
-        """
-        Load the video embedding model.
-        
-        Args:
-            model_config: Configuration for embedding model
-        """
+       
         print(f"Loading {self.embedding_model_type.upper()} embedding model...")
         
         if self.embedding_model_type == 'cnn':
@@ -190,12 +182,7 @@ class VADInferenceEngine:
         print(f"Model configuration: {model_config}")
     
     def load_cluster_model(self, cluster_path: str) -> None:
-        """
-        Load the trained clustering model and centers.
         
-        Args:
-            cluster_path: Path to cluster model or centers
-        """
         print(f"Loading cluster model from: {cluster_path}")
         
         if cluster_path.endswith('.pkl'):
@@ -225,15 +212,7 @@ class VADInferenceEngine:
         print("Cluster model loaded successfully")
     
     def process_video(self, video_path: str) -> np.ndarray:
-        """
-        Process a single video and extract frames.
         
-        Args:
-            video_path: Path to video file
-            
-        Returns:
-            Processed video frames
-        """
         cap = cv2.VideoCapture(video_path)
         frames = []
         
@@ -275,7 +254,6 @@ class VADInferenceEngine:
         if len(video_frames.shape) == 4:
             video_frames = video_frames[np.newaxis, ...]
         
-        # Generate embedding
         with torch.no_grad():
             embedding = self.embedding_model.extract_features(video_frames)
         
@@ -283,18 +261,11 @@ class VADInferenceEngine:
     
     def predict_with_sru(self, embedding: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Make prediction using SRU/SRU++ model.
-        
-        Args:
-            embedding: Video embedding
-            
-        Returns:
-            Tuple of (logits, probabilities)
+        Make prediction using SRU/SRU++ model using Video embedding and returns tuple of (logits, probabilities)
         """
         if self.sru_model is None:
             raise ValueError("SRU model not loaded. Call load_sru_model first.")
         
-        # Convert to tensor and add batch dimension if needed
         if isinstance(embedding, np.ndarray):
             embedding = torch.from_numpy(embedding).float()
         
@@ -303,7 +274,6 @@ class VADInferenceEngine:
         
         embedding = embedding.to(self.device)
         
-        # Make prediction
         with torch.no_grad():
             if self.sru_model_type == 'srupp':
                 logits, _, _ = self.sru_model(embedding)
@@ -315,15 +285,7 @@ class VADInferenceEngine:
         return logits.cpu().numpy(), probabilities.cpu().numpy()
     
     def compute_cluster_enhancement(self, embedding: np.ndarray) -> np.ndarray:
-        """
-        Compute cluster-based enhancement weights.
         
-        Args:
-            embedding: Video embedding (should be flattened)
-            
-        Returns:
-            Enhancement weights for each class
-        """
         if self.cluster_centers is None:
             print("Warning: No cluster centers available. Skipping cluster enhancement.")
             return np.ones(len(self.category_names)) / len(self.category_names)
@@ -348,7 +310,6 @@ class VADInferenceEngine:
             else:
                 similarities.append(0.0)
         
-        # Convert to numpy array and normalize
         similarities = np.array(similarities)
         
         # Normalize to create weights (softmax-like)
@@ -363,17 +324,8 @@ class VADInferenceEngine:
     def enhance_predictions(self, 
                           sru_probabilities: np.ndarray, 
                           cluster_weights: np.ndarray) -> np.ndarray:
-        """
-        Enhance SRU predictions using cluster weights.
         
-        Args:
-            sru_probabilities: Original SRU predictions
-            cluster_weights: Cluster-based enhancement weights
-            
-        Returns:
-            Enhanced probabilities
-        """
-        # Combine SRU predictions with cluster weights
+        # Combine and enhance SRU predictions using cluster weights.
         enhanced_probs = (1 - self.cluster_weight) * sru_probabilities + \
                         self.cluster_weight * cluster_weights
         
@@ -383,37 +335,17 @@ class VADInferenceEngine:
         return enhanced_probs
     
     def predict_single_video(self, video_path: str) -> Dict[str, Any]:
-        """
-        Complete inference pipeline for a single video.
-        
-        Args:
-            video_path: Path to video file
-            
-        Returns:
-            Dictionary containing prediction results
-        """
+       
         try:
-            # Process video
-            video_frames = self.process_video(video_path)
-            
-            # Generate embedding
+            video_frames = self.process_video(video_path)            
             embedding = self.generate_embedding(video_frames)
-            
-            # SRU prediction
-            sru_logits, sru_probabilities = self.predict_with_sru(embedding)
-            
-            # Cluster enhancement
+            sru_logits, sru_probabilities = self.predict_with_sru(embedding)            
             embedding_flat = embedding.reshape(-1) if len(embedding.shape) > 1 else embedding
             cluster_weights = self.compute_cluster_enhancement(embedding_flat)
-            
-            # Enhanced prediction
             enhanced_probabilities = self.enhance_predictions(sru_probabilities, cluster_weights)
-            
-            # Get final prediction
             predicted_class = np.argmax(enhanced_probabilities)
             confidence = enhanced_probabilities[0, predicted_class]
             
-            # Determine if anomaly
             is_anomaly = predicted_class != 0  # Class 0 is "Normal"
             anomaly_confidence = 1.0 - enhanced_probabilities[0, 0]  # 1 - Normal probability
             
@@ -444,15 +376,7 @@ class VADInferenceEngine:
             }
     
     def predict_batch(self, video_paths: List[str]) -> List[Dict[str, Any]]:
-        """
-        Batch inference for multiple videos.
         
-        Args:
-            video_paths: List of video file paths
-            
-        Returns:
-            List of prediction results
-        """
         results = []
         
         print(f"Processing {len(video_paths)} videos...")
@@ -464,28 +388,18 @@ class VADInferenceEngine:
         return results
     
     def get_inference_summary(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """
-        Generate summary statistics for inference results.
         
-        Args:
-            results: List of prediction results
-            
-        Returns:
-            Summary statistics
-        """
         successful_results = [r for r in results if 'error' not in r]
         
         if not successful_results:
             return {'error': 'No successful predictions'}
         
-        # Calculate statistics
         anomaly_count = sum(1 for r in successful_results if r['is_anomaly'])
         normal_count = len(successful_results) - anomaly_count
         
         avg_confidence = np.mean([r['confidence'] for r in successful_results])
         avg_anomaly_confidence = np.mean([r['anomaly_confidence'] for r in successful_results])
         
-        # Class distribution
         class_counts = {}
         for r in successful_results:
             class_name = r['predicted_category']
@@ -555,7 +469,6 @@ class SRUppModel(nn.Module):
 
 
 def main():
-    """Main function with command line interface."""
     parser = argparse.ArgumentParser(description="VAD Inference Pipeline")
     
     # Model paths
@@ -607,12 +520,10 @@ def main():
         cluster_weight=args.cluster_weight
     )
     
-    # Load models
     print("\n" + "="*50)
     print("LOADING MODELS")
     print("="*50)
     
-    # Load embedding model
     embedding_config = {
         'cnn': {'output_size': 1024},
         'resnet': {'output_size': 1024},
@@ -620,10 +531,8 @@ def main():
     }
     engine.load_embedding_model(embedding_config)
     
-    # Load SRU model
     engine.load_sru_model(args.sru_model_path)
     
-    # Load cluster model
     engine.load_cluster_model(args.cluster_model_path)
     
     # Perform inference
@@ -647,12 +556,10 @@ def main():
         
         results = engine.predict_batch(video_paths)
     
-    # Save results
     results_path = os.path.join(args.output_dir, 'inference_results.json')
     with open(results_path, 'w') as f:
         json.dump(results, f, indent=2)
     
-    # Generate summary
     summary = engine.get_inference_summary(results)
     summary_path = os.path.join(args.output_dir, 'inference_summary.json')
     with open(summary_path, 'w') as f:
