@@ -1,6 +1,5 @@
 """
 Real-Time Video Anomaly Detection (VAD) Stream Processor
-
 This module provides a complete real-time video stream processing pipeline for anomaly detection:
 1. Continuous video stream buffering with queue-based frame management
 2. Segment-based processing (100 frames per segment)
@@ -8,9 +7,6 @@ This module provides a complete real-time video stream processing pipeline for a
 4. SRU/SRU++ temporal sequence modeling
 5. Cluster-based enhancement with cosine similarity weighting
 6. Real-time anomaly classification with confidence scores
-
-USAGE: Use this module for real-time video anomaly detection from camera streams or video files
-Author: Generated for VAD Project
 """
 
 import os
@@ -31,7 +27,6 @@ from queue import Queue, Empty
 import warnings
 warnings.filterwarnings('ignore')
 
-# Import custom modules
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -59,14 +54,7 @@ class FrameBuffer:
                  buffer_duration: int = 30,  # seconds
                  fps: int = 30,
                  max_frame_size: Tuple[int, int] = (224, 224)):
-        """
-        Initialize the frame buffer.
         
-        Args:
-            buffer_duration: Duration of video to buffer in seconds
-            fps: Frames per second of the video stream
-            max_frame_size: Maximum frame size (width, height)
-        """
         self.buffer_duration = buffer_duration
         self.fps = fps
         self.max_frames = buffer_duration * fps
@@ -76,22 +64,13 @@ class FrameBuffer:
         self.buffer = deque(maxlen=self.max_frames)
         self.lock = threading.Lock()
         
-        # Statistics
         self.total_frames_added = 0
         self.frames_dropped = 0
         
         print(f"FrameBuffer initialized: {buffer_duration}s @ {fps}fps = {self.max_frames} frames")
     
     def add_frame(self, frame: np.ndarray) -> bool:
-        """
-        Add a frame to the buffer (thread-safe).
         
-        Args:
-            frame: Video frame as numpy array
-            
-        Returns:
-            True if frame was added successfully
-        """
         try:
             # Resize frame if necessary
             if frame.shape[:2] != self.max_frame_size:
@@ -111,38 +90,18 @@ class FrameBuffer:
             return False
     
     def get_segment(self, segment_size: int = 100) -> Optional[np.ndarray]:
-        """
-        Extract a segment of specified size from the buffer.
         
-        Args:
-            segment_size: Number of frames to extract
-            
-        Returns:
-            Segment as numpy array of shape (segment_size, height, width, channels)
-            or None if insufficient frames
-        """
         with self.lock:
             if len(self.buffer) < segment_size:
                 return None
             
-            # Extract the last segment_size frames
-            segment_frames = list(self.buffer)[-segment_size:]
-            
-            # Convert to numpy array
+            segment_frames = list(self.buffer)[-segment_size:]            
             segment = np.array(segment_frames)
             
             return segment
     
     def get_latest_frames(self, count: int) -> Optional[np.ndarray]:
-        """
-        Get the latest N frames from the buffer.
         
-        Args:
-            count: Number of latest frames to get
-            
-        Returns:
-            Latest frames as numpy array or None if insufficient frames
-        """
         with self.lock:
             if len(self.buffer) < count:
                 return None
@@ -151,27 +110,16 @@ class FrameBuffer:
             return np.array(latest_frames)
     
     def pop_segment(self, segment_size: int = 100, overlap: int = 0) -> Optional[np.ndarray]:
-        """
-        Pop a segment from the buffer with optional overlap.
         
-        Args:
-            segment_size: Number of frames to pop
-            overlap: Number of frames to keep for next segment
-            
-        Returns:
-            Popped segment or None if insufficient frames
-        """
         with self.lock:
             if len(self.buffer) < segment_size:
                 return None
             
-            # Extract segment
             segment_frames = []
             for _ in range(segment_size - overlap):
                 if self.buffer:
                     segment_frames.append(self.buffer.popleft())
             
-            # Add overlap frames (keep them in buffer)
             if overlap > 0 and len(self.buffer) >= overlap:
                 overlap_frames = list(self.buffer)[:overlap]
                 segment_frames.extend(overlap_frames)
@@ -179,13 +127,11 @@ class FrameBuffer:
             if len(segment_frames) == segment_size:
                 return np.array(segment_frames)
             else:
-                # Put frames back if incomplete segment
                 for frame in reversed(segment_frames):
                     self.buffer.appendleft(frame)
                 return None
     
     def get_buffer_info(self) -> Dict[str, Any]:
-        """Get buffer statistics and information."""
         with self.lock:
             return {
                 'current_frames': len(self.buffer),
@@ -197,7 +143,6 @@ class FrameBuffer:
             }
     
     def clear(self):
-        """Clear the buffer."""
         with self.lock:
             self.buffer.clear()
 
@@ -211,24 +156,15 @@ class VideoStreamProcessor:
                  source: Union[str, int] = 0,  # 0 for webcam, string for file/RTSP
                  fps: int = 30,
                  frame_size: Tuple[int, int] = (224, 224)):
-        """
-        Initialize the video stream processor.
         
-        Args:
-            source: Video source (camera index, file path, or RTSP URL)
-            fps: Target FPS for processing
-            frame_size: Target frame size for processing
-        """
         self.source = source
         self.fps = fps
         self.frame_size = frame_size
         
-        # Video capture
         self.cap = None
         self.is_running = False
         self.capture_thread = None
         
-        # Frame buffer
         self.frame_buffer = FrameBuffer(
             buffer_duration=30,  # 30 seconds buffer
             fps=fps,
@@ -236,12 +172,7 @@ class VideoStreamProcessor:
         )
         
     def start_capture(self) -> bool:
-        """
-        Start video capture in a separate thread.
         
-        Returns:
-            True if capture started successfully
-        """
         try:
             self.cap = cv2.VideoCapture(self.source)
             
@@ -249,12 +180,10 @@ class VideoStreamProcessor:
                 print(f"Error: Could not open video source: {self.source}")
                 return False
             
-            # Set capture properties
             self.cap.set(cv2.CAP_PROP_FPS, self.fps)
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.frame_size[0])
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.frame_size[1])
             
-            # Get actual properties
             actual_fps = self.cap.get(cv2.CAP_PROP_FPS)
             actual_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             actual_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -262,7 +191,6 @@ class VideoStreamProcessor:
             print(f"Video source opened: {self.source}")
             print(f"Actual FPS: {actual_fps}, Resolution: {actual_width}x{actual_height}")
             
-            # Start capture thread
             self.is_running = True
             self.capture_thread = threading.Thread(target=self._capture_loop, daemon=True)
             self.capture_thread.start()
@@ -274,7 +202,6 @@ class VideoStreamProcessor:
             return False
     
     def _capture_loop(self):
-        """Main capture loop running in separate thread."""
         frame_interval = 1.0 / self.fps
         last_frame_time = time.time()
         
@@ -287,29 +214,22 @@ class VideoStreamProcessor:
             
             current_time = time.time()
             
-            # Control frame rate
             if current_time - last_frame_time >= frame_interval:
-                # Add frame to buffer
                 if self.frame_buffer.add_frame(frame):
                     last_frame_time = current_time
                 
-            # Small sleep to prevent excessive CPU usage
             time.sleep(0.001)
     
     def get_segment(self, segment_size: int = 100) -> Optional[np.ndarray]:
-        """Get a segment from the frame buffer."""
         return self.frame_buffer.get_segment(segment_size)
     
     def pop_segment(self, segment_size: int = 100, overlap: int = 10) -> Optional[np.ndarray]:
-        """Pop a segment from the frame buffer with overlap."""
         return self.frame_buffer.pop_segment(segment_size, overlap)
     
     def get_buffer_info(self) -> Dict[str, Any]:
-        """Get buffer information."""
         return self.frame_buffer.get_buffer_info()
     
     def stop_capture(self):
-        """Stop video capture."""
         self.is_running = False
         
         if self.capture_thread and self.capture_thread.is_alive():
@@ -323,42 +243,24 @@ class VideoStreamProcessor:
 
 
 class SegmentProcessor:
-    """
-    Processes video segments by converting frames to tensors and preparing for embedding generation.
-    """
     
     def __init__(self, device: torch.device = None):
-        """
-        Initialize the segment processor.
         
-        Args:
-            device: PyTorch device for processing
-        """
         self.device = device or torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         print(f"SegmentProcessor initialized on device: {self.device}")
     
     def frames_to_tensor(self, frames: np.ndarray, normalize: bool = True) -> torch.Tensor:
-        """
-        Convert video frames to PyTorch tensor.
         
-        Args:
-            frames: Video frames of shape (num_frames, height, width, channels)
-            normalize: Whether to normalize pixel values to [0, 1]
-            
-        Returns:
-            Tensor of shape (num_frames, channels, height, width)
-        """
-        # Convert to tensor and change dimensions: (N, H, W, C) -> (N, C, H, W)
+        # Converted to tensor and change dimensions: (N, H, W, C) -> (N, C, H, W)
         if frames.dtype != np.float32:
             frames = frames.astype(np.float32)
         
         if normalize:
             frames = frames / 255.0
         
-        # Convert to tensor
         tensor = torch.from_numpy(frames).to(self.device)
         
-        # Permute dimensions: (N, H, W, C) -> (N, C, H, W)
+        # Permuted dimensions: (N, H, W, C) -> (N, C, H, W)
         tensor = tensor.permute(0, 3, 1, 2)
         
         return tensor
@@ -367,17 +269,7 @@ class SegmentProcessor:
                           frames: np.ndarray,
                           target_size: Tuple[int, int] = (224, 224),
                           normalize: bool = True) -> torch.Tensor:
-        """
-        Preprocess a video segment for embedding generation.
         
-        Args:
-            frames: Video frames array
-            target_size: Target frame size
-            normalize: Whether to normalize
-            
-        Returns:
-            Processed tensor ready for embedding models
-        """
         processed_frames = []
         
         for frame in frames:
@@ -393,27 +285,16 @@ class SegmentProcessor:
 
 
 class EmbeddingGenerator:
-    """
-    Generates video embeddings using various models (CNN, ResNet50, ViT).
-    """
-    
+   
     def __init__(self, 
                  model_type: str = 'resnet',
                  device: torch.device = None,
                  model_config: Dict[str, Any] = None):
-        """
-        Initialize the embedding generator.
         
-        Args:
-            model_type: Type of model ('cnn', 'resnet', 'vit')
-            device: PyTorch device
-            model_config: Model configuration parameters
-        """
         self.model_type = model_type.lower()
         self.device = device or torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model_config = model_config or {}
         
-        # Initialize the embedding model
         self.model = None
         self.embedding_dim = None
         self._initialize_model()
@@ -421,7 +302,6 @@ class EmbeddingGenerator:
         print(f"EmbeddingGenerator initialized with {model_type} model on {self.device}")
     
     def _initialize_model(self):
-        """Initialize the embedding model based on model_type."""
         try:
             if self.model_type == 'cnn':
                 self.model = CNNVideoFeatureExtractor(
@@ -453,7 +333,6 @@ class EmbeddingGenerator:
             self._initialize_fallback_model()
     
     def _initialize_fallback_model(self):
-        """Initialize a simple fallback CNN model."""
         class SimpleCNN(nn.Module):
             def __init__(self, embedding_dim=1024):
                 super(SimpleCNN, self).__init__()
@@ -464,7 +343,7 @@ class EmbeddingGenerator:
                 self.fc = nn.Linear(128 * 7 * 7, embedding_dim)
                 
             def forward(self, x):
-                # x shape: (batch_size, channels, height, width)
+                # shape: (batch_size, channels, height, width)
                 x = F.relu(self.conv1(x))
                 x = F.max_pool2d(x, 2)
                 x = F.relu(self.conv2(x))
@@ -480,21 +359,12 @@ class EmbeddingGenerator:
         print("Fallback CNN model initialized")
     
     def generate_embeddings(self, frames_tensor: torch.Tensor) -> np.ndarray:
-        """
-        Generate embeddings for video frames.
         
-        Args:
-            frames_tensor: Video frames tensor of shape (num_frames, channels, height, width)
-            
-        Returns:
-            Embeddings array of shape (num_frames, embedding_dim)
-        """
         try:
             self.model.eval()
             embeddings = []
             
             with torch.no_grad():
-                # Process frames in batches to avoid memory issues
                 batch_size = 8
                 num_frames = frames_tensor.shape[0]
                 
@@ -502,33 +372,25 @@ class EmbeddingGenerator:
                     batch_end = min(i + batch_size, num_frames)
                     batch_frames = frames_tensor[i:batch_end]
                     
-                    # Generate embeddings for batch
                     if hasattr(self.model, 'extract_features'):
                         batch_embeddings = self.model.extract_features(batch_frames)
                     else:
                         batch_embeddings = self.model(batch_frames)
                     
-                    # Convert to numpy and append
                     batch_embeddings = batch_embeddings.cpu().numpy()
                     embeddings.append(batch_embeddings)
                 
-                # Concatenate all embeddings
                 final_embeddings = np.concatenate(embeddings, axis=0)
                 
                 return final_embeddings
                 
         except Exception as e:
             print(f"Error generating embeddings: {e}")
-            # Return dummy embeddings as fallback
             num_frames = frames_tensor.shape[0]
             return np.random.randn(num_frames, self.embedding_dim).astype(np.float32)
 
 
 class RealTimeVADEngine:
-    """
-    Complete Real-Time Video Anomaly Detection Engine.
-    Integrates all components for continuous video stream processing.
-    """
     
     def __init__(self,
                  video_source: Union[str, int] = 0,
@@ -561,7 +423,6 @@ class RealTimeVADEngine:
         self.confidence_threshold = confidence_threshold
         self.device = device or torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # Components
         self.stream_processor = None
         self.segment_processor = None
         self.embedding_generator = None
@@ -569,17 +430,14 @@ class RealTimeVADEngine:
         self.cluster_model = None
         self.cluster_centers = None
         
-        # Processing state
         self.is_processing = False
         self.processing_thread = None
         self.results_queue = Queue()
         
-        # Statistics
         self.total_segments_processed = 0
         self.anomalies_detected = 0
         self.processing_times = []
         
-        # Category mapping
         self.category_names = [
             "Normal", "Abuse", "Arson", "Assault", "Road Accident", "Burglary",
             "Explosion", "Fighting", "Robbery", "Shooting", "Stealing", "Vandalism"
@@ -593,20 +451,16 @@ class RealTimeVADEngine:
         print(f"  - Segment size: {segment_size} frames")
     
     def initialize_components(self):
-        """Initialize all processing components."""
         print("Initializing components...")
         
-        # Initialize video stream processor
         self.stream_processor = VideoStreamProcessor(
             source=self.video_source,
             fps=30,
             frame_size=(224, 224)
         )
         
-        # Initialize segment processor
         self.segment_processor = SegmentProcessor(device=self.device)
         
-        # Initialize embedding generator
         self.embedding_generator = EmbeddingGenerator(
             model_type=self.embedding_model_type,
             device=self.device
@@ -617,17 +471,10 @@ class RealTimeVADEngine:
     def load_models(self, 
                    sru_model_path: str,
                    cluster_model_path: Optional[str] = None):
-        """
-        Load trained SRU and clustering models.
         
-        Args:
-            sru_model_path: Path to trained SRU model
-            cluster_model_path: Path to trained clustering model
-        """
         print("Loading models...")
         
         try:
-            # Load SRU model
             if self.sru_model_type.lower() == 'sru':
                 self.sru_model = SRUModel(
                     input_size=self.embedding_generator.embedding_dim,
@@ -643,7 +490,6 @@ class RealTimeVADEngine:
                     num_classes=12
                 ).to(self.device)
             
-            # Load model weights
             checkpoint = torch.load(sru_model_path, map_location=self.device)
             if 'model_state_dict' in checkpoint:
                 self.sru_model.load_state_dict(checkpoint['model_state_dict'])
@@ -653,7 +499,6 @@ class RealTimeVADEngine:
             self.sru_model.eval()
             print(f"SRU model loaded from {sru_model_path}")
             
-            # Load clustering model if provided
             if cluster_model_path and os.path.exists(cluster_model_path):
                 with open(cluster_model_path, 'rb') as f:
                     cluster_data = pickle.load(f)
@@ -677,11 +522,9 @@ class RealTimeVADEngine:
         
         print("Starting real-time processing...")
         
-        # Start video capture
         if not self.stream_processor.start_capture():
             raise RuntimeError("Failed to start video capture")
         
-        # Start processing thread
         self.is_processing = True
         self.processing_thread = threading.Thread(target=self._processing_loop, daemon=True)
         self.processing_thread.start()
@@ -689,12 +532,10 @@ class RealTimeVADEngine:
         print("Real-time processing started")
     
     def _processing_loop(self):
-        """Main processing loop running in separate thread."""
         print("Processing loop started...")
         
         while self.is_processing:
             try:
-                # Get segment from buffer
                 segment = self.stream_processor.pop_segment(
                     segment_size=self.segment_size,
                     overlap=self.segment_overlap
@@ -704,12 +545,10 @@ class RealTimeVADEngine:
                     time.sleep(0.1)  # Wait for more frames
                     continue
                 
-                # Process segment
                 start_time = time.time()
                 result = self._process_segment(segment)
                 processing_time = time.time() - start_time
                 
-                # Store results
                 if result:
                     result['processing_time'] = processing_time
                     result['timestamp'] = time.time()
@@ -728,52 +567,36 @@ class RealTimeVADEngine:
                 time.sleep(0.1)
     
     def _process_segment(self, segment: np.ndarray) -> Optional[Dict[str, Any]]:
-        """
-        Process a single video segment.
         
-        Args:
-            segment: Video segment array of shape (segment_size, height, width, channels)
-            
-        Returns:
-            Processing results dictionary
-        """
         try:
-            # Convert frames to tensor
             frames_tensor = self.segment_processor.preprocess_segment(segment)
             
-            # Generate embeddings
             embeddings = self.embedding_generator.generate_embeddings(frames_tensor)
             
-            # Prepare embeddings for SRU (add batch dimension and convert to tensor)
+            # Prepared embeddings for SRU (add batch dimension and convert to tensor)
             embeddings_tensor = torch.from_numpy(embeddings).unsqueeze(0).to(self.device)
             
-            # Transpose for SRU: (batch, sequence, features) -> (sequence, batch, features)
+            # Transposed for SRU: (batch, sequence, features) -> (sequence, batch, features)
             embeddings_tensor = embeddings_tensor.transpose(0, 1)
             
-            # Get SRU predictions
             with torch.no_grad():
                 sru_output = self.sru_model(embeddings_tensor)
                 sru_probabilities = F.softmax(sru_output, dim=1).cpu().numpy()[0]
             
-            # Get predicted class from SRU
             sru_predicted_class = np.argmax(sru_probabilities)
             sru_confidence = np.max(sru_probabilities)
             
-            # Apply cluster enhancement if available
             final_probabilities = sru_probabilities.copy()
             cluster_weights = None
             enhancement_applied = False
             
             if self.cluster_model and self.cluster_centers is not None:
                 try:
-                    # Use mean of embeddings for clustering
                     segment_embedding = np.mean(embeddings, axis=0).reshape(1, -1)
                     
-                    # Calculate cosine similarities to cluster centers
                     similarities = cosine_similarity(segment_embedding, self.cluster_centers)[0]
                     cluster_weights = similarities / np.sum(similarities)  # Normalize
                     
-                    # Weight the SRU probabilities with cluster similarities
                     final_probabilities = (1 - self.cluster_weight) * sru_probabilities + \
                                          self.cluster_weight * cluster_weights
                     enhancement_applied = True
@@ -782,16 +605,13 @@ class RealTimeVADEngine:
                     print(f"Warning: Cluster enhancement failed: {e}")
                     final_probabilities = sru_probabilities
             
-            # Final prediction
             predicted_class = np.argmax(final_probabilities)
             confidence = np.max(final_probabilities)
             predicted_category = self.category_names[predicted_class]
             
-            # Determine if anomaly (class 0 is Normal)
             is_anomaly = predicted_class != 0 and confidence >= self.confidence_threshold
             anomaly_confidence = confidence if is_anomaly else 0.0
             
-            # Prepare result
             result = {
                 'predicted_class': int(predicted_class),
                 'predicted_category': predicted_category,
@@ -812,7 +632,6 @@ class RealTimeVADEngine:
             return None
     
     def get_latest_results(self, count: int = 1) -> List[Dict[str, Any]]:
-        """Get the latest processing results."""
         results = []
         try:
             for _ in range(min(count, self.results_queue.qsize())):
@@ -824,7 +643,6 @@ class RealTimeVADEngine:
         return results
     
     def get_statistics(self) -> Dict[str, Any]:
-        """Get processing statistics."""
         buffer_info = self.stream_processor.get_buffer_info() if self.stream_processor else {}
         
         avg_processing_time = np.mean(self.processing_times) if self.processing_times else 0
