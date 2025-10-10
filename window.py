@@ -2,7 +2,7 @@
 This is an implementation of window class
 ------Discarded because of low accuracy------
 
-author: @tinykishore, @mariamuna04
+author: @mariamuna04, @tinykishore
 """
 
 import cv2
@@ -25,24 +25,15 @@ class Window:
             window_size (int): The size of the sliding window.
             stride (int): The step size for moving the window.
             frame_average_count (int): The number of frames to be averaged for each group.
-        """
-        # The duration of the video in seconds
+        """ 
         self.__video_duration = None
-        # The size of the sliding window
         self.__window_size = window_size
-        # The step size for moving the window
         self.__stride = stride
-        # The number of frames to be averaged for each group
         self.__frame_average_count = frame_average_count
-        # The path to the video file
         self.__video_path = video_path
-        # An array containing processed frames from the video
         self.__total_frames = self.__get_frames()
-        # The average frame of the video
         self.__averaged_frames = self.__get_average_frame()
-        # A sliding window of frames
         self.__windows = self.__prepare_window()
-        # The index of the current window in the windowed clip
         self.__window_index = 0
 
     def next(self):
@@ -60,30 +51,15 @@ class Window:
             return None
 
     def has_next(self):
-        """
-        This method checks if there is a next window in the windowed clip.
-
-        Returns:
-            bool: True if there is a next window, False otherwise.
-        """
+        
         return self.__window_index < len(self.__windows)
 
     def current_window(self):
-        """
-        This method returns the current window in the windowed clip.
-
-        Returns:
-            numpy.ndarray: The current window in the windowed clip.
-        """
+    
         return self.__windows[self.__window_index]
 
     def previous(self):
-        """
-        This method strides to the previous window in the windowed clip.
-
-        Returns:
-            numpy.ndarray: The previous window in the windowed clip.
-        """
+    
         if self.__window_index > 0:
             self.__window_index -= 1
             return self.__windows[self.__window_index]
@@ -99,14 +75,11 @@ class Window:
 
     def __prepare_window(self):
         """
-        Prepares a sliding window of frames from the average frame of the video.
-        This method divides the average frame into overlapping windows of 'window_size' frames.
+        This method prepares a sliding window of frames from the average frame of the video and divides the average frame into overlapping windows of 'window_size' frames.
         The stride parameter determines the step size for moving the window.
-        The number of steps is calculated based on the average frame shape and video duration.
-        The resulting windows are stored in a numpy array
+        The number of steps is calculated based on the average frame shape and video duration and the resulting windows are stored in a numpy array
 
-        Returns:
-            numpy.ndarray: A sliding window of frames.
+        Will retuen a sliding window of frames.
         """
         window = []
         fps = self.__averaged_frames.shape[0] // self.__video_duration
@@ -118,12 +91,11 @@ class Window:
 
     def __get_average_frame(self):
         """
-        Computes the average frame of the video by taking the mean of consecutive frames. This method divides the video
+        This method computes the average frame of the video by taking the mean of consecutive frames. This method divides the video
         frames into groups, each containing 'avg_no' frames. For each group, it computes the mean frame by averaging
         the pixel values of all frames in the group.
 
-        Returns:
-            numpy.ndarray: The average frame of the video.
+        Returns the average frame of the video.
         """
         reduced_frames = []
         for i in range(0, len(self.__total_frames), self.__frame_average_count):
@@ -134,12 +106,7 @@ class Window:
 
     def __get_frames(self):
         """
-        This method reads the video file and returns the frames
-
-        Returns:
-            numpy.ndarray: An array containing processed frames from the video.
-        Raises:
-            IOError: If the video file cannot be read or does not exist.
+        This method reads the video file and returns the frames and returns an array containing processed frames from the video.
         """
         video = cv2.VideoCapture(self.__video_path)
         if not video.isOpened():
@@ -160,21 +127,11 @@ class Window:
         return np.array(frames)
 
     def __iter__(self):
-        """
-        This method makes the object iterable.
-
-        Returns:
-            Window: The object itself.
-        """
+      
         return self  # Return self to make the object iterable
 
     def __next__(self):
-        """
-        This method returns the next window in the windowed clip. (used for iteration)
-
-        Returns:
-            numpy.ndarray: The next window in the windowed clip.
-        """
+    
         if self.has_next():
             self.__window_index += 1
             return self.__windows[self.__window_index - 1]
@@ -185,8 +142,7 @@ class Window:
         """
         This method returns the stats of the current window.
 
-        Returns:
-            dict: A dictionary containing the statistics of the current window.
+        Returns a dictionary containing the statistics of the current window.
         """
         return {
             "index": self.__window_index,
