@@ -1,12 +1,8 @@
 """
 Video Embedding Clustering Module for Video Anomaly Detection (VAD)
-
 This module provides K-means clustering functionality for video embeddings.
 It trains clusters using true labels and embeddings, then creates cluster centers
 for enhanced classification in the VAD pipeline.
-
-USAGE: Use this module to create clusters from video embeddings for improved classification
-Author: Generated for VAD Project
 """
 
 import os
@@ -39,17 +35,7 @@ class VideoEmbeddingClusterer:
                  normalize_embeddings: bool = True,
                  use_pca: bool = False,
                  pca_components: int = 512):
-        """
-        Initialize the clustering module.
         
-        Args:
-            n_clusters: Number of clusters (should match number of classes)
-            random_state: Random state for reproducibility
-            max_iter: Maximum iterations for K-means
-            normalize_embeddings: Whether to normalize embeddings before clustering
-            use_pca: Whether to apply PCA for dimensionality reduction
-            pca_components: Number of PCA components
-        """
         self.n_clusters = n_clusters
         self.random_state = random_state
         self.max_iter = max_iter
@@ -57,7 +43,6 @@ class VideoEmbeddingClusterer:
         self.use_pca = use_pca
         self.pca_components = pca_components
         
-        # Initialize components
         self.kmeans = None
         self.scaler = None
         self.pca = None
@@ -65,37 +50,24 @@ class VideoEmbeddingClusterer:
         self.cluster_labels = None
         self.embedding_shape = None
         
-        # Category mapping for multiclass
         self.category_names = [
             "Normal", "Abuse", "Arson", "Assault", "Road Accident", "Burglary", 
             "Explosion", "Fighting", "Robbery", "Shooting", "Stealing", "Vandalism"
         ]
         
-        # Statistics
         self.training_stats = {}
         
         print(f"VideoEmbeddingClusterer initialized with {n_clusters} clusters")
     
     def prepare_embeddings(self, embeddings: np.ndarray) -> np.ndarray:
-        """
-        Prepare embeddings for clustering by reshaping and normalizing.
         
-        Args:
-            embeddings: Video embeddings of shape (n_videos, n_frames, n_features)
-            
-        Returns:
-            Processed embeddings ready for clustering
-        """
         print(f"Original embeddings shape: {embeddings.shape}")
         
-        # Store original shape for later use
         self.embedding_shape = embeddings.shape
         
-        # Flatten the embeddings (n_videos, n_frames * n_features)
         flattened_embeddings = embeddings.reshape(embeddings.shape[0], -1)
         print(f"Flattened embeddings shape: {flattened_embeddings.shape}")
         
-        # Apply normalization if requested
         if self.normalize_embeddings:
             if self.scaler is None:
                 self.scaler = StandardScaler()
@@ -106,7 +78,6 @@ class VideoEmbeddingClusterer:
         else:
             normalized_embeddings = flattened_embeddings
         
-        # Apply PCA if requested
         if self.use_pca:
             if self.pca is None:
                 self.pca = PCA(n_components=self.pca_components, random_state=self.random_state)
@@ -123,25 +94,14 @@ class VideoEmbeddingClusterer:
     def train_clusters(self, 
                       embeddings: np.ndarray, 
                       labels: np.ndarray) -> Dict[str, Any]:
-        """
-        Train K-means clusters using embeddings and true labels.
         
-        Args:
-            embeddings: Video embeddings of shape (n_videos, n_frames, n_features)
-            labels: True labels for videos
-            
-        Returns:
-            Dictionary containing training statistics and results
-        """
         print("Starting cluster training...")
         print(f"Embeddings shape: {embeddings.shape}")
         print(f"Labels shape: {labels.shape}")
         print(f"Unique labels: {np.unique(labels)}")
         
-        # Prepare embeddings
         processed_embeddings = self.prepare_embeddings(embeddings)
         
-        # Initialize and train K-means
         self.kmeans = KMeans(
             n_clusters=self.n_clusters,
             random_state=self.random_state,
@@ -152,26 +112,21 @@ class VideoEmbeddingClusterer:
         print("Training K-means clustering...")
         cluster_predictions = self.kmeans.fit_predict(processed_embeddings)
         
-        # Store cluster centers and labels
         self.cluster_centers = self.kmeans.cluster_centers_
         self.cluster_labels = cluster_predictions
         
-        # Calculate training statistics
         silhouette_avg = silhouette_score(processed_embeddings, cluster_predictions)
         ari_score = adjusted_rand_score(labels, cluster_predictions)
         inertia = self.kmeans.inertia_
         
-        # Analyze cluster-label correspondence
         cluster_label_analysis = self._analyze_cluster_label_correspondence(
             cluster_predictions, labels
         )
         
-        # Create label-to-cluster mapping
         label_to_cluster_map = self._create_label_cluster_mapping(
             cluster_predictions, labels
         )
         
-        # Store training statistics
         self.training_stats = {
             'silhouette_score': silhouette_avg,
             'adjusted_rand_index': ari_score,
@@ -192,19 +147,9 @@ class VideoEmbeddingClusterer:
     def _analyze_cluster_label_correspondence(self, 
                                            cluster_predictions: np.ndarray, 
                                            true_labels: np.ndarray) -> Dict[str, Any]:
-        """
-        Analyze the correspondence between clusters and true labels.
-        
-        Args:
-            cluster_predictions: Predicted cluster labels
-            true_labels: True class labels
-            
-        Returns:
-            Dictionary with correspondence analysis
-        """
+       
         analysis = {}
         
-        # Create confusion matrix between clusters and labels
         confusion_matrix = np.zeros((self.n_clusters, len(self.category_names)))
         
         for cluster_id in range(self.n_clusters):
@@ -218,7 +163,6 @@ class VideoEmbeddingClusterer:
         
         analysis['confusion_matrix'] = confusion_matrix
         
-        # Find best label for each cluster
         cluster_best_labels = {}
         for cluster_id in range(self.n_clusters):
             best_label = np.argmax(confusion_matrix[cluster_id, :])
@@ -236,16 +180,7 @@ class VideoEmbeddingClusterer:
     def _create_label_cluster_mapping(self, 
                                     cluster_predictions: np.ndarray, 
                                     true_labels: np.ndarray) -> Dict[int, int]:
-        """
-        Create a mapping from true labels to their most common cluster.
-        
-        Args:
-            cluster_predictions: Predicted cluster labels
-            true_labels: True class labels
-            
-        Returns:
-            Dictionary mapping label -> most_common_cluster
-        """
+       
         label_cluster_map = {}
         
         for label in range(len(self.category_names)):
@@ -260,19 +195,8 @@ class VideoEmbeddingClusterer:
     def compute_class_centers(self, 
                             embeddings: np.ndarray, 
                             labels: np.ndarray) -> Dict[int, np.ndarray]:
-        """
-        Compute centers for each class using true labels.
-        
-        Args:
-            embeddings: Video embeddings
-            labels: True labels
-            
-        Returns:
-            Dictionary mapping class_id -> class_center
-        """
-        print("Computing class centers...")
-        
-        # Prepare embeddings
+       
+        print("Computing class centers...")        
         processed_embeddings = self.prepare_embeddings(embeddings)
         
         class_centers = {}
@@ -290,15 +214,7 @@ class VideoEmbeddingClusterer:
         return class_centers
     
     def predict_clusters(self, embeddings: np.ndarray) -> np.ndarray:
-        """
-        Predict cluster assignments for new embeddings.
-        
-        Args:
-            embeddings: Video embeddings to cluster
-            
-        Returns:
-            Cluster predictions
-        """
+      
         if self.kmeans is None:
             raise ValueError("Model not trained. Call train_clusters first.")
         
@@ -308,16 +224,7 @@ class VideoEmbeddingClusterer:
     def compute_cosine_similarities(self, 
                                   embedding: np.ndarray, 
                                   centers: Dict[int, np.ndarray]) -> Dict[int, float]:
-        """
-        Compute cosine similarities between an embedding and class centers.
         
-        Args:
-            embedding: Single embedding vector
-            centers: Dictionary of class centers
-            
-        Returns:
-            Dictionary mapping class_id -> cosine_similarity
-        """
         similarities = {}
         
         for class_id, center in centers.items():
@@ -331,21 +238,11 @@ class VideoEmbeddingClusterer:
                           labels: np.ndarray, 
                           save_path: Optional[str] = None,
                           method: str = 'pca') -> None:
-        """
-        Visualize clusters using dimensionality reduction.
         
-        Args:
-            embeddings: Video embeddings
-            labels: True labels
-            save_path: Path to save the plot
-            method: Dimensionality reduction method ('pca' or 'tsne')
-        """
         print(f"Visualizing clusters using {method.upper()}...")
         
-        # Prepare embeddings
         processed_embeddings = self.prepare_embeddings(embeddings)
         
-        # Apply dimensionality reduction for visualization
         if method.lower() == 'pca':
             reducer = PCA(n_components=2, random_state=self.random_state)
         else:
@@ -354,10 +251,7 @@ class VideoEmbeddingClusterer:
         
         embeddings_2d = reducer.fit_transform(processed_embeddings)
         
-        # Create the plot
-        plt.figure(figsize=(15, 10))
-        
-        # Define colors for each category
+        plt.figure(figsize=(15, 10))        
         colors = plt.cm.tab20(np.linspace(0, 1, len(self.category_names)))
         
         # Plot points for each category
@@ -407,12 +301,7 @@ class VideoEmbeddingClusterer:
         plt.show()
     
     def save_model(self, save_path: str) -> None:
-        """
-        Save the trained clustering model and components.
-        
-        Args:
-            save_path: Path to save the model
-        """
+      
         model_data = {
             'kmeans': self.kmeans,
             'scaler': self.scaler,
@@ -438,12 +327,7 @@ class VideoEmbeddingClusterer:
         print(f"Model saved to: {save_path}")
     
     def load_model(self, load_path: str) -> None:
-        """
-        Load a trained clustering model.
-        
-        Args:
-            load_path: Path to load the model from
-        """
+    
         with open(load_path, 'rb') as f:
             model_data = pickle.load(f)
         
@@ -456,7 +340,6 @@ class VideoEmbeddingClusterer:
         self.training_stats = model_data['training_stats']
         self.category_names = model_data['category_names']
         
-        # Update config
         config = model_data['config']
         self.n_clusters = config['n_clusters']
         self.random_state = config['random_state']
@@ -471,16 +354,7 @@ class VideoEmbeddingClusterer:
 
 def load_embeddings_and_labels(embeddings_path: str, 
                               labels_path: str) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Load embeddings and labels from numpy files.
     
-    Args:
-        embeddings_path: Path to embeddings .npy file
-        labels_path: Path to labels .npy file
-        
-    Returns:
-        Tuple of (embeddings, labels)
-    """
     print(f"Loading embeddings from: {embeddings_path}")
     print(f"Loading labels from: {labels_path}")
     
